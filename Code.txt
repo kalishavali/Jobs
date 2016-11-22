@@ -1,0 +1,100 @@
+import java.util.Scanner;
+
+public class Maze{
+    
+    
+    static Scanner in = new Scanner(System.in);
+    static int[][] maze;
+
+    static boolean solveMaze(int x,int y,int tx,int ty,int b,int h){
+
+        if(x>=0 && x<b && y>=0 && y<h && maze[x][y]==1){//Checking if current cell is legal
+            maze[x][y]-=1;
+            if(x==tx && y==ty)//checking if point has reached
+                return true;
+            boolean up,down,left,right;
+            /*
+             Calculating horizontal and vertical distances and moving according to it
+            */
+            int xDiff=tx-x;
+            if(xDiff<0)
+                xDiff*=-1;
+            int yDiff=ty-y;
+            if(yDiff<0)
+                yDiff*=-1;
+            if(xDiff<yDiff){
+                if(tx<x){
+                    up=solveMaze(x-1,y,tx,ty,b,h);
+                    down=solveMaze(x+1,y,tx,ty,b,h);
+                }
+                else{
+                    down=solveMaze(x+1,y,tx,ty,b,h);
+                    up=solveMaze(x-1,y,tx,ty,b,h);
+                }
+                if(ty<y){
+                    left=solveMaze(x,y-1,tx,ty,b,h);
+                    right=solveMaze(x,y+1,tx,ty,b,h);
+                }
+                else{
+                    right=solveMaze(x,y+1,tx,ty,b,h);
+                    left=solveMaze(x,y-1,tx,ty,b,h);
+                }
+            }
+            else{
+                if(ty<y){
+                    left=solveMaze(x,y-1,tx,ty,b,h);
+                    right=solveMaze(x,y+1,tx,ty,b,h);
+                }
+                else{
+                    right=solveMaze(x,y+1,tx,ty,b,h);
+                    left=solveMaze(x,y-1,tx,ty,b,h);
+                }
+                if(tx<x){
+                    up=solveMaze(x-1,y,tx,ty,b,h);
+                    down=solveMaze(x+1,y,tx,ty,b,h);
+                }
+                else{
+                    down=solveMaze(x+1,y,tx,ty,b,h);
+                    up=solveMaze(x-1,y,tx,ty,b,h);
+                }
+            }
+            //print opposite movement if the cell is a part of the path
+            if(up||down||left||right){
+                if(up)
+                    System.out.println("DOWN");
+                if(down)
+                    System.out.println("UP");
+                if(left)
+                    System.out.println("RIGHT");
+                if(right)
+                    System.out.println("LEFT");
+                return true;
+            }
+            maze[x][y]+=1;//backtrack
+            return false;
+        }
+        return false;
+    }
+    public static void main(String[] args) {
+        System.out.println("enter number of rows and columns ");
+        System.out.print("Rows: ");
+        int b = in.nextInt();
+        System.out.print("Columns: ");
+        int h = in.nextInt();
+        maze=new int[b][h];
+        System.out.println("enter maze 1 for path and 0 for wall");
+        for(int i=0;i<b;i++) 
+            for(int j=0;j<h;j++)
+                maze[i][j]=in.nextInt();
+        System.out.print("Enter Jerry position\nX: ");
+        int begx=in.nextInt(); 
+        System.out.print("Y: ");
+        int begy=in.nextInt();
+        System.out.print("Enter cheese position\nX: ");
+        int tarx=in.nextInt();
+        System.out.print("Y: ");
+        int tary=in.nextInt();
+        if(!solveMaze(tarx,tary,begx,begy,b,h))
+        System.out.println("no path");
+    }
+}
