@@ -1,73 +1,101 @@
-function commonErrorCallback( transactionId, error )
+var equipmentIDStatus="false";
+function createDB()
 {
-  kony.print(" Error code:: " + error);
-  kony.print(" Error message:: " + error.message);
-}
-function commonVoidcallback(  )
-{
-  kony.print("The transaction was executed successfully.");
-}
-function success_createTable( transactionId, resultset )
-{	
-  kony.print("suceesfully created table");
-}
+	kony.print("createDB Function:");
+	webSQLFlag = 1;
+	baseObjectId = kony.db.openDatabase("webSqlDB",
+                                      "1.0",
+                                      "Sample SQL Database",
+                                      5 * 1024 * 1024); //5MB Space                         
+	kony.db.transaction(baseObjectId,
+						createTable,
+						commonErrorCallback,
+						commonVoidcallback);
 
-function success_dropTable( transactionId, resultset )
-{
-  kony.print("Table was dropped");
 }
-
 function createTable( dbId )
 {
-  
-  kony.print("Creating Table");
-  var sqlStatement = "DROP TABLE IF EXISTS emEmpDtls";
-  kony.db.executeSql(dbId,
-                     sqlStatement,
-                     null,
-                     success_dropTable,
-                     commonErrorCallback);
-  var sqlStatement = "CREATE TABLE IF NOT EXISTS emEmpDtls (empname TEXT)";
-  kony.db.executeSql(dbId,
-                     sqlStatement,
-                     null,
-                     success_createTable,
-                     commonErrorCallback); 
-  
-  kony.print("Inserting into Table");
-  var insertTable=[ "Adriana C. Ocampo Uria ","Albert Einstein ","Anna K. Behrensmeyer ","Anand","Abhimanyu","Akhila","Aradhaya","Anupama","Akanksha","Aparna",
+	kony.print("createTable Function:");
+	var sqlStatement = "DROP TABLE IF EXISTS emEmpDtls";
+	kony.db.executeSql(dbId,
+						sqlStatement,
+						null,
+						success_dropTable,
+						commonErrorCallback);
+	var sqlStatement = "CREATE TABLE IF NOT EXISTS emEmpDtls (empname TEXT)";
+	kony.db.executeSql(dbId,
+						sqlStatement,
+						null,
+						success_createTable,
+						commonErrorCallback); 
+	insertIntoTable(dbId);
+}
+function insertIntoTable(dbId){
+	kony.print("insertIntoTable Function:");
+	var insertTable=[ "Adriana C. Ocampo Uria ","Albert Einstein ","Anna K. Behrensmeyer ","Anand","Abhimanyu","Akhila","Aradhaya","Anupama","Akanksha","Aparna",
 					"Arjun","Amen","Allah","aswaddhama","anusha","aishwarya","anushka","anurag","athreya","Anirudh",
                    "Blaise Pascal ","Caroline Herschel ","Cecilia Payne-Gaposchkin ",
                    "Chien-Shiung Wu ","Dorothy Hodgkin ","Edmond Halley ","Edwin Powell Hubble ","Elizabeth Blackburn ","Enrico Fermi ","Erwin Schroedinger ",
                    "Flossie Wong-Staal ","Frieda Robscheit-Robbins ","Geraldine Seydoux ","Gertrude B. Elion ","Ingrid Daubechies ","Jacqueline K. Barton ","Jane Goodall ","Jocelyn Bell Burnell ","Johannes Kepler ","Lene Vestergaard Hau ","Lise Meitner ","Lord Kelvin ","Maria Mitchell ","Marie Curie ","Max Born ","Max Planck ","Melissa Franklin ","Michael Faraday ","Mildred S. Dresselhaus ","Nicolaus Copernicus ","Niels Bohr ","Patricia S. Goldman-Rakic ","Patty Jo Watson ","Polly Matzinger ","Richard Phillips Feynman ","Rita Levi-Montalcini ","Rosalind Franklin ","Ruzena Bajcsy ","Sarah Boysen ","Shannon W. Lucid ","Shirley Ann Jackson ","Sir Ernest Rutherford ","Sir Isaac Newton ","Stephen Hawking ","Werner Karl Heisenberg ","Wilhelm Conrad Roentgen ","Wolfgang Ernst Pauli"];
-  for ( i=0;  i <= insertTable.length; i++ )
-  {
-    var sqlStatement = " INSERT INTO emEmpDtls VALUES ('"+insertTable[i]+"') ";	
-    kony.db.executeSql(dbId,sqlStatement,
-                       null,
-                       success_createTable,
-                       commonErrorCallback);
-  }
-
+	for ( i=0;  i <= insertTable.length; i++ )
+	{
+		var sqlStatement = " INSERT INTO emEmpDtls VALUES ('"+insertTable[i]+"') ";	
+		kony.db.executeSql(dbId,sqlStatement,
+							null,
+							success_createTable,
+							commonErrorCallback);
+	}
 }
-function createDB()
+function fetchTableData()
+{	
+	kony.print("fetchTableData Function");
+	try
+	{
+        equipmentIDStatus="false";
+		var equipmentID=frmDefaultSettings.txtEquipmentID.text.trim();
+		if(equipmentID.length>0){
+			if (webSQLFlag == 0)
+			{		
+				kony.print("Database is not Created");
+				return;
+			}
+			kony.db.transaction(baseObjectId,
+								sqlQuery,
+								commonErrorCallback,
+								commonVoidcallback);
+		}
+		frmDefaultSettings.segPredictiveResults.setVisibility(false);
+        
+	}
+	catch(err)
+	{
+		kony.print("error in  select transaction"+err);
+		kony.print("Please create the database and then fetch the Data");
+	}
+}
+function sqlQuery( dbId )
 {
-  webSQLFlag = 1;
-  baseObjectId = kony.db.openDatabase("webSqlDB",
-                                      "1.0",
-                                      "Sample SQL Database",
-                                      5 * 1024 * 1024); //5MB Space                         
-  kony.db.transaction(baseObjectId,
-                      createTable,
-                      commonErrorCallback,
-                      commonVoidcallback);
-
+	kony.print("sqlQuery Function:");
+	try
+	{
+		var equipmentID=frmDefaultSettings.txtEquipmentID.text.trim();
+		var sqlStatement = "SELECT * FROM emEmpDtls where empname like '"+equipmentID+"%' ";
+		kony.db.executeSql(dbId,
+							sqlStatement,
+							null,
+							sqlQuerySuccess,
+							commonErrorCallback);
+	}
+	catch(err)
+	{
+		kony.print("error while selecting "+err);
+	}
 }
 function sqlQuerySuccess( transactionId, resultset )
 {
-  	  kony.print("Query Successfully Executed");
-	  if(resultset !== null)
-      {
+	kony.print("Query Successfully Executed");
+	if(resultset !== null)
+    {
         var numResults = resultset.rows.length;
         frmDefaultSettings.segPredictiveResults.setVisibility(true);
 
@@ -81,69 +109,38 @@ function sqlQuerySuccess( transactionId, resultset )
         kony.print(JSON.stringify(insertTable));
         frmDefaultSettings.segPredictiveResults.widgetDataMap={ lblEmpName:"empName" };
         frmDefaultSettings.segPredictiveResults.setData (insertTable);
-	  }
-
-}
-function sqlQuery( dbId )
-{
-  kony.print("SQL Query Statement");
-  try
-  {
-      var equipmentID=frmDefaultSettings.txtEquipmentID.text.trim();
-      var sqlStatement = "SELECT * FROM emEmpDtls where empname like '"+equipmentID+"%' ";
-      kony.db.executeSql(dbId,
-                         sqlStatement,
-                         null,
-                         sqlQuerySuccess,
-                         commonErrorCallback);
-     frmDefaultSettings.segPredictiveResults.setVisibility(false);
-  }
-  catch(err)
-  {
-    kony.print("error while selecting "+err);
-  }
-}
-function fetchTableData()
-{	
-  kony.print("Fetching Data From Table");
-  try
-  {
-    var equipmentID=frmDefaultSettings.txtEquipmentID.text.trim();
-    if(equipmentID.length>0){
-      if (webSQLFlag == 0)
-      {	
-        kony.print("Please create the database First");
-        return;
-      }
-      kony.db.transaction(baseObjectId,
-                          sqlQuery,
-                          commonErrorCallback,
-                          commonVoidcallback);
-      
+	}else{
+      alert("checking");
     }
-    frmDefaultSettings.segPredictiveResults.setVisibility(false);
-  }
-  catch(err)
-  {
-    kony.print("error in  select transaction"+err);
-    kony.print("Please create the database and then fetch the Data");
-  }
+}
+function commonErrorCallback( transactionId, error )
+{
+	kony.print(" Error code:: " + error);
+	kony.print(" Error message:: " + error.message);
+}
+function commonVoidcallback(  )
+{
+	kony.print("The transaction was executed successfully.");
+}
+function success_createTable( transactionId, resultset )
+{	
+	kony.print("Table was Created");
 }
 
+function success_dropTable( transactionId, resultset )
+{
+	kony.print("Table was dropped");
+}
 function setEquipmentID(){
   	kony.print("setEquipmentID Method:");
   	frmDefaultSettings.txtEquipmentID.text=
   		frmDefaultSettings.segPredictiveResults.selectedRowItems[0].empName;
-  	equipmentIDStatus=true;
+  	equipmentIDStatus="true";
 	frmDefaultSettings.segPredictiveResults.setVisibility(false);
 }
-
 function checkingInput(){
-  kony.print("checkingInput Method:");
-  alert("onTouchEnd:"+equipmentIDStatus);
-//   alert(equipmentIDStatus);
-//   if(!equipmentIDStatus){
-//     frmDefaultSettings.txtEquipmentID.text="";
-//   }
+  	kony.print("checkingInput Method:");
+  	if(equipmentIDStatus=="false"){
+	   frmDefaultSettings.txtEquipmentID.text="";
+	}
 }
-
