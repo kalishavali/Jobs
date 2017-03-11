@@ -1,1 +1,79 @@
-function clearDropdown(eqID,eqType){ if(typeof(eqType) === "undefined"){  frmDefaultSettings.inputEquipmentID.text="";  //frmDefaultSettings.segEquipmentIDResults.setData();    }else{  frmDefaultSettings.inputEquipmentID.text="";  //frmDefaultSettings.segEquipmentIDResults.setData();  frmDefaultSettings.listboxEquipmentType.masterData=[{"defaultKey","Select Equipment Type"}];  frmDefaultSettings.listboxEquipmentType.selectedKey="defaultKey";    }}function disableDropdown(eqID,eqType){ //disable the widgets and  if(typeof(eqType) === "undefined"){  frmDefaultSettings.inputEquipmentID.setEnabled(false);  //frmDefaultSettings.segEquipmentIDResults.setEnabled(false);    }else{  frmDefaultSettings.inputEquipmentID.setEnabled(false);  //frmDefaultSettings.segEquipmentIDResults.setEnabled(false);  frmDefaultSettings.listboxEquipmentType.setEnabled(false);    }}function enableDropdown(widget){ setDisable---true; frmDefaultSettings.widget.setEnabled(true); if(widget=="inputEquipmentID"){  ////frmDefaultSettings.segEquipmentIDResults.setEnabled(true); }}function onchangeSiteNames(){  siteName = siteName.val();        clearDropDown(eqID,eqType);        disableDropDown(eqID,eqType);        if(siteName === '0') {             return;        }        enableDropDown(listboxEquipmentType);        generateOptions(eqType);}function onChangeEqType(){  eqType = eqType.val();        clearDropDown(eqID);        disableDropDown(eqID);        if(eqType === 'defaultKey') {             return;        }        enableDropDown(inputEquipmentID);        generateOptions(eqID);}function onChangeEQID(){ eqID = eqID.val(); console.log(eqID);}
+function clearDropDownEQID(){ 
+  	frmDefaultSettings.inputEquipmentID.text="";
+    frmDefaultSettings.segEquipmentIDResults.setData([]);
+}
+function clearDropDownEQTYPE_ID(){ 
+  
+    frmDefaultSettings.inputEquipmentID.text=""; 
+    frmDefaultSettings.segEquipmentIDResults.setData([]); 
+  
+    frmDefaultSettings.listboxEquipmentType.masterData=[["defaultKey","Select Equipment Type"]];  
+    frmDefaultSettings.listboxEquipmentType.selectedKey="defaultKey";    
+  
+}
+function disableDropDownEQTYPE_ID(){ 
+  // disable the widgets and     //   
+  
+    frmDefaultSettings.inputEquipmentID.setEnabled(false);  
+    frmDefaultSettings.segEquipmentIDResults.setEnabled(false); 
+  
+    frmDefaultSettings.listboxEquipmentType.setEnabled(false);  
+  
+  	frmDefaultSettings.btnSave.setEnabled(false);
+  
+}
+function disableDropDownEQID(){ 
+  //disable the widgets and        
+    frmDefaultSettings.inputEquipmentID.setEnabled(false);  
+    frmDefaultSettings.segEquipmentIDResults.setEnabled(false);      
+}
+function enableDropDownEQTYPE(){ 
+  //setDisable---true; 
+  frmDefaultSettings.listboxEquipmentType.setEnabled(true);
+}
+function enableDropDownEQID(){ 
+  //setDisable---true; 
+  frmDefaultSettings.inputEquipmentID.setEnabled(true); 
+  frmDefaultSettings.segEquipmentIDResults.setEnabled(true); 
+}
+function preShowOfFrom(){       
+  	disableDropDownEQTYPE_ID();       
+}
+function onchangeSiteNames(){  
+  var siteName = frmDefaultSettings.listboxSiteNames.selectedKey;        
+  clearDropDownEQTYPE_ID();        
+  disableDropDownEQTYPE_ID();        
+  if(siteName === '0') {             
+    return;        
+  }        
+  enableDropDownEQTYPE();        
+  //generateOptions(eqType);
+  frmDefaultSettings.listboxEquipmentType.masterData=[["defaultKey","select Equipment Type"],["One","Thousand"],["two","Two"],["three","Three"]];
+}
+
+function onChangeEqType(){  
+  var eqType = frmDefaultSettings.listboxEquipmentType.selectedKey;        
+  clearDropDownEQID();        
+  disableDropDownEQID();        
+  if(eqType === 'defaultKey') {             
+    return;        
+  }        
+  enableDropDownEQID();        
+  //generateOptions(eqID);  
+}
+function onChangeEQID(){ 
+  var eqID = frmDefaultSettings.inputEquipmentID.text.trim();
+  if(eqID.contains){
+    
+  }else{
+    
+  }
+  frmDefaultSettings.segEquipmentIDResults.widgetDataMap={lblEquipmentID:"eqID"};
+  frmDefaultSettings.segEquipmentIDResults.setData( [ {eqID:"data1"}, {eqID:"datax"} ] );
+  frmDefaultSettings.segEquipmentIDResults.setVisibility(true);
+}
+function onRowClick(){
+  frmDefaultSettings.inputEquipmentID.text=frmDefaultSettings.segEquipmentIDResults.selectedRowItems[0].eqID;
+  frmDefaultSettings.segEquipmentIDResults.setVisibility(false);
+  frmDefaultSettings.btnSave.setEnabled(true);
+}
